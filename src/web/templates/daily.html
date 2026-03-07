@@ -143,6 +143,48 @@
             <p>No GitHub trending projects found in the selected run.</p>
             {% endif %}
           </div>
+
+          <h2>Hugging Face Trending</h2>
+          <div class="post-body">
+            {% set hf_items = [] %}
+            {% if sections and sections.hf and sections.hf["items"] %}
+              {% set hf_items = sections.hf["items"] %}
+            {% endif %}
+            {% if hf_items %}
+              {% for item in hf_items %}
+              <div class="news-item">
+                <h3>
+                  <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
+                </h3>
+                <p class="item-meta">
+                  {{ item.signals.kind if item.signals.kind else "item" }} |
+                  Rank {{ item.signals.rank if item.signals.rank is defined else "-" }} |
+                  Score {{ item.signals.score if item.signals.score is defined else 0 }} |
+                  ❤ total {{ item.signals.likes_total if item.signals.likes_total is defined else 0 }} |
+                  ⬇ {{ item.signals.downloads if item.signals.downloads is defined else 0 }}
+                </p>
+                <p>{{ item.summary_short if item.summary_short else item.summary_raw }}</p>
+                {% if item.signals.keypoints %}
+                <ul>
+                  {% for kp in item.signals.keypoints %}
+                  <li>{{ kp }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+                {% if item.signals.takeaways %}
+                <p><strong>Takeaways:</strong></p>
+                <ul>
+                  {% for tw in item.signals.takeaways %}
+                  <li>{{ tw }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </div>
+              {% endfor %}
+            {% else %}
+            <p>No Hugging Face trending items found in the selected run.</p>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>

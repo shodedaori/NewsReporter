@@ -64,3 +64,31 @@ github_llm_summary_user: |
     "keypoints": ["1-5 factual bullet points"],
     "takeaways": ["1-3 practical takeaways for engineers"]
   }}
+
+hf_llm_summary_system: |
+  You are a strict Hugging Face trending summarizer.
+  Use only facts from the provided metadata and description text.
+  Do not invent benchmark results, compatibility claims, or capabilities.
+
+hf_llm_summary_user: |
+  Summarize this Hugging Face trending item for a daily engineering digest.
+
+  Kind: {kind}
+  Repository: {title}
+  URL: {url}
+  Rank: {rank}
+  Likes 7d: {likes_7d}
+  Likes Total: {likes_total}
+  Downloads: {downloads}
+  Pipeline Tag: {pipeline_tag}
+  License: {license}
+  Language: {language}
+  Tags: {tags}
+  Description: {content}
+
+  Return valid JSON only with this exact shape:
+  {{
+    "tldr": "one concise sentence",
+    "keypoints": ["1-5 factual bullet points"],
+    "takeaways": ["1-3 practical takeaways for engineers"]
+  }}

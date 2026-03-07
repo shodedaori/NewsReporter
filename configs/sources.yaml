@@ -90,3 +90,10 @@ github:
   trending_url: https://github.com/trending?since=daily
   request_timeout: 15
   readme_max_chars: 10000
+
+hf:
+  sort: trending_score
+  card_data: true
+  models_limit: 40
+  datasets_limit: 40
+  request_timeout: 20

@@ -8,6 +8,7 @@ summarizer:
   mode: llm
   arxiv_mode: llm
   github_mode: llm
+  hf_mode: llm
   llm:
     model: gemini-2.5-flash
     timeout_seconds: 20
@@ -68,3 +69,7 @@ scoring:
   github:
     stars_today_weight: 1.0
     stars_total_weight: 0.6
+  hf:
+    likes_7d_weight: 1.0
+    likes_total_weight: 0.3
+    downloads_weight: 0.1

@@ -44,7 +44,7 @@ class DailyOrchestrator:
                 total_unique += int(result.stats.get("unique_count", 0))
                 total_published += int(result.stats.get("published_count", 0))
                 total_failures += int(result.stats.get("failures", 0))
-                if result.section != "github":
+                if result.section not in {"github", "hf"}:
                     self.store.upsert_items(result.items)
                 print(f"[progress] section={result.section} completed", flush=True)
 
@@ -60,6 +60,7 @@ class DailyOrchestrator:
             news_items = self._section_items_payload(section_results, "news")
             arxiv_items = self._section_items_payload(section_results, "arxiv")
             github_items = self._section_items_payload(section_results, "github")
+            hf_items = self._section_items_payload(section_results, "hf")
             daily_context = {
                 "site_name": self.app_config["app"]["site_name"],
                 "page_title": f"{digest_date.isoformat()} News Digest",
@@ -72,6 +73,7 @@ class DailyOrchestrator:
                     "news": {"items": news_items, "stats": section_results.get("news").stats if section_results.get("news") else {}},
                     "arxiv": {"items": arxiv_items, "stats": section_results.get("arxiv").stats if section_results.get("arxiv") else {}},
                     "github": {"items": github_items, "stats": section_results.get("github").stats if section_results.get("github") else {}},
+                    "hf": {"items": hf_items, "stats": section_results.get("hf").stats if section_results.get("hf") else {}},
                 },
             }
             daily_html = self.renderer.render_daily(daily_context)

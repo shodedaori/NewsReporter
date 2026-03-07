@@ -22,6 +22,10 @@ from src.sections.github.pipeline import GitHubSectionPipeline
 from src.sections.github.plugins.github import GitHubPlugin
 from src.sections.github.scorer import GitHubScorer
 from src.sections.github.summarizer import build_github_summarizer
+from src.sections.huggingface.pipeline import HuggingFaceSectionPipeline
+from src.sections.huggingface.plugins.huggingface import HuggingFacePlugin
+from src.sections.huggingface.scorer import HuggingFaceScorer
+from src.sections.huggingface.summarizer import build_hf_summarizer
 from src.sections.news.pipeline import NewsSectionPipeline
 from src.sections.news.plugins.rss_news import RSSNewsPlugin
 from src.sections.news.scorer import NewsScorer
@@ -42,7 +46,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--date", default=date.today().isoformat(), help="Digest date in YYYY-MM-DD")
     parser.add_argument("--dry-run", action="store_true", help="Run with preview output")
     parser.add_argument("--publish", action="store_true", help="Write to publish output path")
-    parser.add_argument("--sections", default="news,arxiv,github", help="Comma-separated sections to run, e.g. news,arxiv,github")
+    parser.add_argument("--sections", default="news,arxiv,github,hf", help="Comma-separated sections to run, e.g. news,arxiv,github,hf")
     parser.add_argument("--config-dir", default="configs", help="Config directory path")
     parser.add_argument("--secret-config", default="configs/secret.setting.yaml", help="Secret settings yaml path")
     parser.add_argument("--log-level", default="INFO", help="Python logging level")
@@ -97,15 +101,24 @@ def main() -> int:
         scorer=GitHubScorer(default_config.get("scoring", {})),
         summarizer=build_github_summarizer(default_config, prompts_config),
     )
+    hf_pipeline = HuggingFaceSectionPipeline(
+        app_config=default_config,
+        source_config=source_config,
+        plugins=[HuggingFacePlugin()],
+        scorer=HuggingFaceScorer(default_config.get("scoring", {})),
+        summarizer=build_hf_summarizer(default_config, prompts_config),
+    )
     pipeline_map = {
         "news": news_pipeline,
         "arxiv": arxiv_pipeline,
         "github": github_pipeline,
+        "hf": hf_pipeline,
+        "huggingface": hf_pipeline,
     }
     requested_sections = [value.strip().lower() for value in args.sections.split(",") if value.strip()]
     section_pipelines = [pipeline_map[name] for name in requested_sections if name in pipeline_map]
     if not section_pipelines:
-        raise ValueError("No valid sections selected. Supported: news,arxiv,github")
+        raise ValueError("No valid sections selected. Supported: news,arxiv,github,hf")
 
     orchestrator = DailyOrchestrator(
         store=store,
