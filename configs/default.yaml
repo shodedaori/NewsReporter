@@ -2,7 +2,7 @@ app:
   site_name: NewsReporter Daily Briefing
   timezone: UTC
   window_hours: 24
-  top_items: 30
+  top_items: 8
 
 paths:
   database: data/state.db
@@ -15,19 +15,23 @@ scoring:
   source_weights:
     rss_news: 0
   keywords:
-    - earnings
-    - funding
-    - acquisition
-    - layoffs
-    - partnership
-    - launch
-    - regulation
-    - ai
-  companies:
-    - OpenAI
-    - Microsoft
-    - Google
-    - Anthropic
-    - Meta
-    - Apple
-    - NVIDIA
+    - Infrastructure
+    - CUDA
+    - Distributed
+    - Inference
+    - Reinforcement
+    - Policy
+    - Reward
+    - Alignment
+    - Diffusion
+    - Generative
+    - Synthesis
+    - Sampling
+    - Multimodal
+    - Vision
+    - Modality
+    - Perception
+    - Agent
+    - Planning
+    - Reasoning
+    - Memory

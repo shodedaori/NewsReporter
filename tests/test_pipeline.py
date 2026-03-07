@@ -63,7 +63,7 @@ def test_pipeline_dry_run_generates_preview() -> None:
             "templates": "src/web/templates",
             "static": "src/web/static",
         },
-        "scoring": {"source_weights": {"rss_news": 2}, "keywords": ["enterprise"], "companies": ["OpenAI"]},
+        "scoring": {"source_weights": {"rss_news": 2}, "keywords": ["enterprise"]},
     }
     source_config = {"rss_news": {"feeds": []}}
 
