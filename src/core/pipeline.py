@@ -24,6 +24,7 @@ class DailyOrchestrator:
         self.section_pipelines = section_pipelines
 
     def run(self, digest_date: date, dry_run: bool, publish: bool) -> dict:
+        print(f"[progress] orchestrator start date={digest_date.isoformat()} dry_run={dry_run} publish={publish}", flush=True)
         run_id = self.store.start_run(digest_date.isoformat(), dry_run=dry_run)
         output_root = self.app_config["paths"]["output_preview"] if dry_run or not publish else self.app_config["paths"]["output_site"]
         digest_status = "preview" if dry_run or not publish else "published"
@@ -36,6 +37,7 @@ class DailyOrchestrator:
             total_published = 0
 
             for section_pipeline in self.section_pipelines:
+                print(f"[progress] run section={section_pipeline.section}", flush=True)
                 result = section_pipeline.run(digest_date=digest_date)
                 section_results[result.section] = result
                 total_items += int(result.stats.get("item_count", 0))
@@ -43,6 +45,7 @@ class DailyOrchestrator:
                 total_published += int(result.stats.get("published_count", 0))
                 total_failures += int(result.stats.get("failures", 0))
                 self.store.upsert_items(result.items)
+                print(f"[progress] section={result.section} completed", flush=True)
 
             stats = {
                 "item_count": total_items,
@@ -53,7 +56,7 @@ class DailyOrchestrator:
             }
             generated_at = next(iter(section_results.values())).generated_at if section_results else ""
 
-            news_items = self._news_items_payload(section_results, max_items=int(self.app_config["app"].get("top_items", 30)))
+            news_items = self._news_items_payload(section_results)
             daily_context = {
                 "site_name": self.app_config["app"]["site_name"],
                 "page_title": f"{digest_date.isoformat()} News Digest",
@@ -65,6 +68,7 @@ class DailyOrchestrator:
                 "sections": {"news": {"items": news_items, "stats": section_results.get("news").stats if section_results.get("news") else {}}},
             }
             daily_html = self.renderer.render_daily(daily_context)
+            print("[progress] daily page rendered", flush=True)
 
             recent_digests = self.store.list_recent_digests(limit=14, include_preview=digest_status == "preview")
             current_digest = {
@@ -84,6 +88,7 @@ class DailyOrchestrator:
                 "digests": digests,
             }
             index_html = self.renderer.render_index(index_context)
+            print("[progress] homepage rendered", flush=True)
 
             paths = self.publisher.publish(
                 digest_date=digest_date.isoformat(),
@@ -92,6 +97,7 @@ class DailyOrchestrator:
                 output_root=output_root,
                 static_root=self.app_config["paths"]["static"],
             )
+            print(f"[progress] publish done root={paths['root']}", flush=True)
             self.store.save_digest(
                 digest_date=digest_date.isoformat(),
                 status=digest_status,
@@ -101,6 +107,7 @@ class DailyOrchestrator:
 
             run_status = "partial_success" if total_failures else "success"
             self.store.finish_run(run_id=run_id, status=run_status, message="daily orchestration finished", stats=stats)
+            print(f"[progress] orchestrator finished status={run_status}", flush=True)
             return {
                 "status": run_status,
                 "digest_date": digest_date.isoformat(),
@@ -112,7 +119,7 @@ class DailyOrchestrator:
             self.store.finish_run(run_id=run_id, status="failed", message=str(exc), stats={})
             raise
 
-    def _news_items_payload(self, section_results: dict[str, SectionResult], max_items: int) -> list[dict]:
+    def _news_items_payload(self, section_results: dict[str, SectionResult]) -> list[dict]:
         news_result = section_results.get("news")
         if not news_result:
             return []
@@ -125,11 +132,10 @@ class DailyOrchestrator:
                 "signals": item.signals,
                 "section": item.section,
             }
-            for item in news_result.items[:max_items]
+            for item in news_result.items
         ]
 
 
 class NewsPipeline:  # compatibility shim
     def __init__(self, *args, **kwargs):  # noqa: ANN002, ANN003
         raise RuntimeError("NewsPipeline has been replaced by section pipelines + DailyOrchestrator")
-

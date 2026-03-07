@@ -30,6 +30,21 @@
                   {{ item.published_at if item.published_at else "time unknown" }}
                 </p>
                 <p>{{ item.summary_short }}</p>
+                {% if item.signals.keypoints %}
+                <ul>
+                  {% for kp in item.signals.keypoints %}
+                  <li>{{ kp }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+                {% if item.signals.takeaways %}
+                <p><strong>Takeaways:</strong></p>
+                <ul>
+                  {% for tw in item.signals.takeaways %}
+                  <li>{{ tw }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
               </div>
               {% endfor %}
             {% else %}

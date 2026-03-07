@@ -153,6 +153,8 @@ venv.bak/
 
 # mkdocs documentation
 /site
+output/
+configs/secret.setting.yaml
 
 # mypy
 .mypy_cache/

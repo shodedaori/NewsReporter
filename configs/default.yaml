@@ -4,6 +4,14 @@ app:
   window_hours: 24
   top_items: 8
 
+summarizer:
+  mode: llm
+  llm:
+    model: gemini-2.5-flash
+    timeout_seconds: 20
+    max_input_chars: 4000
+    max_output_chars: 280
+
 paths:
   database: data/state.db
   output_site: output/site

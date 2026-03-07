@@ -27,3 +27,9 @@ Clean DB for tests:
 ```bash
 python scripts/clean_db.py --reinit
 ```
+
+Enable LLM news summarizer:
+
+1. Set `summarizer.mode: llm` in `configs/default.yaml`
+2. Export `OPENAI_API_KEY`
+3. Optional: set `OPENAI_BASE_URL` for compatible gateways

@@ -1,3 +1,19 @@
-news_tldr: |
-  Summarize in one concise sentence using only provided facts.
-  Avoid speculation and keep wording plain.
+news_llm_summary_system: |
+  You are a strict news summarizer.
+  Use only facts from the provided input.
+  No speculation, no invented details, no marketing language.
+
+news_llm_summary_user: |
+  Summarize this news item.
+
+  Title: {title}
+  URL: {url}
+  Source: {source}
+  Content: {content}
+
+  Return valid JSON only with this exact shape:
+  {{
+    "tldr": "one concise sentence",
+    "keypoints": ["1-5 bullet points"],
+    "takeaways": ["1-3 takeaways"]
+  }}
