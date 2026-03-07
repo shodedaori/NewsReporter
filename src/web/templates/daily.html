@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="section-blog-post">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="post-container">
+          <a class="back" href="/index.html">Back to all digests</a>
+
+          <h1>{{ digest_date }} News Digest</h1>
+          <span class="by">
+            Generated at <strong>{{ generated_at }}</strong> |
+            {{ stats.unique_count }} unique items
+          </span>
+
+          <div class="post-body">
+            {% set news_items = items %}
+            {% if sections and sections.news and sections.news["items"] %}
+              {% set news_items = sections.news["items"] %}
+            {% endif %}
+            {% if news_items %}
+              {% for item in news_items %}
+              <div class="news-item">
+                <h3>
+                  <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
+                </h3>
+                <p class="item-meta">
+                  Score {{ item.signals.score }} |
+                  {{ item.signals.feed_name }} |
+                  {{ item.published_at if item.published_at else "time unknown" }}
+                </p>
+                <p>{{ item.summary_short }}</p>
+              </div>
+              {% endfor %}
+            {% else %}
+            <p>No news items found in the selected 24-hour window.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

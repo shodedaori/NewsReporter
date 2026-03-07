@@ -6,9 +6,15 @@
 
 We build a **daily static publishing system**, not a generic chatbot and not a CMS.
 
-Pipeline is fixed:
+Lifecycle is fixed (per section):
 
-`collect -> normalize -> score -> summarize -> render -> publish`
+`collect -> normalize -> score -> summarize -> render`
+
+Execution model is fixed:
+- each section has its own pipeline (`news`, `arxiv`, `github`, `huggingface`)
+- run section pipelines sequentially
+- aggregate section outputs into one daily static page + homepage
+- publish once at the end (global publish), never per-section publish
 
 Current frontend template base:
 
@@ -50,18 +56,20 @@ Target:
    - no runtime database-backed website
    - generated HTML is the product
 
-2. **Single pipeline**
-   - every source must go through the same flow:
+2. **Section-isolated pipelines**
+   - every section must go through the same lifecycle:
      - fetch
      - normalize
      - score
      - summarize
      - render
-     - publish
+   - scoring/dedup/ranking are isolated by section
+   - `news` and `arxiv` must not affect each other's scores
 
-3. **Plugin architecture**
-   - each source is a plugin
-   - no source-specific hacks inside the main pipeline
+3. **Base class + subclass architecture**
+   - define base abstractions for `Item`, `Scorer`, `Pipeline`, `SourcePlugin`
+   - each section implements its own subclass
+   - no section-specific hacks inside shared base logic
 
 4. **Idempotent publishing**
    - rerunning the same date must update or overwrite the same digest
@@ -119,17 +127,36 @@ newsreporter/
       main.py
     core/
       models.py
-      pipeline.py
+      base_pipeline.py
+      base_scorer.py
+      base_plugin.py
       store.py
-      scorer.py
       summarizer.py
       publisher.py
       utils.py
+    sections/
+      news/
+        pipeline.py
+        scorer.py
+        plugins/
+          rss_news.py
+      arxiv/
+        pipeline.py
+        scorer.py
+        plugins/
+          arxiv.py
+      github/
+        pipeline.py
+        scorer.py
+        plugins/
+          github.py
+      huggingface/
+        pipeline.py
+        scorer.py
+        plugins/
+          huggingface.py
     plugins/
-      rss_news.py
-      arxiv.py
-      github.py
-      huggingface.py
+      # optional shared plugin helpers only
     web/
       renderer.py
       templates/
@@ -161,6 +188,7 @@ Every source must normalize to one common item shape.
 
 ```python
 Item = {
+  "section": str,  # news|arxiv|github|huggingface
   "source": str,
   "source_id": str,
   "title": str,
@@ -178,7 +206,7 @@ Item = {
 Must be stable:
 
 ```text
-sha256(f"{source}|{source_id_or_url}")
+sha256(f"{section}|{source}|{source_id_or_url}")
 ```
 
 Priority:
@@ -224,10 +252,11 @@ PRAGMA synchronous=NORMAL;
 
 ## 7. Source Plugin Rules
 
-Each source implements one plugin.
+Each section plugin implements one plugin interface.
 
 ```python
 class SourcePlugin:
+    section: str
     name: str
     def fetch(self, since, config) -> list[Item]:
         ...
@@ -251,13 +280,12 @@ class SourcePlugin:
 
 ## Phase 1 — News scoring
 Use simple, explainable scoring:
-- freshness
 - keyword/topic/company match
 - source preference if needed
 
 Example:
 ```text
-score = freshness_score + keyword_match_score + source_weight
+score = keyword_match_score + source_weight + feed_weight
 ```
 
 ## Phase 2 — arXiv scoring
@@ -271,6 +299,8 @@ Keep it explainable.
 
 ## Phase 3 — GitHub / HF scoring
 Trending must be **velocity-based**, not just popularity-based.
+Each section has its own scorer subclass and score space.
+No cross-section score normalization in Phase 1-3.
 
 ### GitHub
 Use:
@@ -338,11 +368,12 @@ Nginx is only the distributor, not the styling layer.
 ## 11. Publishing Rules
 
 Publish flow:
-1. generate daily digest data
-2. render daily page
-3. render homepage
-4. write files atomically
-5. mark digest as published
+1. run section pipelines in order (`news -> arxiv -> github -> huggingface`)
+2. collect each section's output payload
+3. render one combined daily page
+4. render homepage
+5. write files atomically
+6. mark digest as published
 
 Publishing must be rerunnable.
 
@@ -400,11 +431,13 @@ If a system cannot dry-run, it is not ready.
 
 ## 15. Failure Rules
 
-Single-source failure must not kill the whole digest.
+Single-source failure must not kill its section.
+Single-section failure must not kill the whole digest.
 
 Allowed behavior:
 - source fails
 - log failure
+- continue with remaining sources in that section
 - continue with remaining sections
 - publish partial digest if enough content exists
 

@@ -1,0 +1,41 @@
+rss_news:
+  feeds:
+    - name: Nvidia Official Blog
+      url: https://blogs.nvidia.com/feed/
+      weight: 100
+    - name: Google Official Blog
+      url: https://blog.google/rss/
+      weight: 100
+    - name: Meta Official Blog
+      url: https://about.fb.com/news/feed/
+      weight: 100
+    - name: Microsoft Official Blog
+      url: https://blogs.microsoft.com/feed/
+      weight: 100
+    - name: OpenAI Official News
+      url: https://openai.com/news/rss.xml
+      weight: 100
+    - name: Apple Newsroom
+      url: https://www.apple.com/newsroom/rss-feed.rss
+      weight: 100
+    - name: Google News Aggregated - OpenAI
+      url: https://news.google.com/rss/search?q=OpenAI&hl=en-US&gl=US&ceid=US:en
+      weight: 20
+    - name: Google News Aggregated - Microsoft
+      url: https://news.google.com/rss/search?q=Microsoft&hl=en-US&gl=US&ceid=US:en
+      weight: 20
+    - name: Google News Aggregated - Google
+      url: https://news.google.com/rss/search?q=Google&hl=en-US&gl=US&ceid=US:en
+      weight: 20
+    - name: Google News Aggregated - Anthropic
+      url: https://news.google.com/rss/search?q=Anthropic&hl=en-US&gl=US&ceid=US:en
+      weight: 20
+    - name: Google News Aggregated - Meta
+      url: https://news.google.com/rss/search?q=Meta&hl=en-US&gl=US&ceid=US:en
+      weight: 20
+    - name: Google News Aggregated - Apple
+      url: https://news.google.com/rss/search?q=Apple&hl=en-US&gl=US&ceid=US:en
+      weight: 20
+    - name: Google News Aggregated - NVIDIA
+      url: https://news.google.com/rss/search?q=NVIDIA&hl=en-US&gl=US&ceid=US:en
+      weight: 20

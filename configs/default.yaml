@@ -1,0 +1,33 @@
+app:
+  site_name: NewsReporter Daily Briefing
+  timezone: UTC
+  window_hours: 24
+  top_items: 30
+
+paths:
+  database: data/state.db
+  output_site: output/site
+  output_preview: output/preview/site
+  templates: src/web/templates
+  static: src/web/static
+
+scoring:
+  source_weights:
+    rss_news: 0
+  keywords:
+    - earnings
+    - funding
+    - acquisition
+    - layoffs
+    - partnership
+    - launch
+    - regulation
+    - ai
+  companies:
+    - OpenAI
+    - Microsoft
+    - Google
+    - Anthropic
+    - Meta
+    - Apple
+    - NVIDIA

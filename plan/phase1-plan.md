@@ -28,27 +28,33 @@
 
 ## 3. Phase 1 最小可用架构
 
-固定流水线：
-`collect -> normalize -> score -> summarize -> render -> publish`
+Phase 1（news section）流水线：
+`collect -> normalize -> score -> summarize -> render`
+
+全局发布模型：
+- 本阶段虽只有 `news`，但仍按“section 独立处理，最后统一 publish”设计。
+- `publish` 不属于 section pipeline，属于 orchestrator 的最后一步。
 
 模块与职责：
-- `plugins/rss_news.py`
+- `core/base_pipeline.py` / `core/base_scorer.py` / `core/base_plugin.py`
+  - 定义统一抽象，避免未来 arXiv/GH/HF 接入时重写主流程。
+- `sections/news/plugins/rss_news.py`
   - 按配置抓取 RSS，超时/重试/退避。
   - 输出统一 `Item` 结构并给出基础 `signals`。
-- `core/pipeline.py`
-  - 串联全流程，按日期窗口（24h）执行。
+- `sections/news/pipeline.py`
+  - 仅处理 news section 全流程（到 render 为止）。
   - 单源失败不终止全局。
-- `core/scorer.py`
-  - 可解释打分：`freshness + keyword/company match + source_weight`。
+- `sections/news/scorer.py`
+  - 可解释打分：`keyword/company match + source_weight + feed_weight`。
 - `core/summarizer.py`
   - 两级摘要：抽取优先，短 TL;DR 兜底；输入薄则输出薄。
 - `core/store.py`（SQLite）
   - 最少落表：`items_canonical`、`daily_digest`、`runs`。
   - 打开 `WAL` 和 `synchronous=NORMAL`。
 - `web/renderer.py`（Jinja2）
-  - 渲染首页与每日页，输出到 `output/site/...`。
+  - 渲染首页与每日页（读取 section payload）。
 - `core/publisher.py`
-  - 原子写入（临时文件 + replace）。
+  - 统一原子发布（临时文件 + replace）。
   - 同日重跑覆盖同一路径，不新增重复归档。
 
 ## 4. 配置与数据契约
@@ -57,6 +63,7 @@
 - 公司列表、RSS 源、关键词、source 权重、发布时区/调度。
 
 统一数据结构（Phase 1 必用）：
+- `section`（固定为 `news`）
 - `source`
 - `source_id`
 - `title`
@@ -69,7 +76,7 @@
 - `dedup_key`
 
 `dedup_key`：
-- `sha256(f"{source}|{source_id_or_url}")`
+- `sha256(f"{section}|{source}|{source_id_or_url}")`
 - 优先级：`source_id > url > title+published_at`
 
 ## 5. 输出与发布约束
@@ -79,10 +86,10 @@
 - `output/site/daily/YYYY-MM-DD/index.html`
 
 发布顺序固定：
-1. 生成当日 digest 数据
-2. 渲染 daily 页
-3. 渲染首页
-4. 原子写文件
+1. 运行 news section pipeline，产出 section payload
+2. 组装 daily 聚合数据（当前仅 news）
+3. 渲染 daily 页与首页
+4. 统一原子 publish（一次）
 5. 标记 digest 已发布
 
 幂等性：
@@ -115,4 +122,3 @@ Phase 1 完成判定：
 - 首页正确指向最新 digest。
 - 当日归档页存在且可访问。
 - 可被 Nginx 直接静态托管。
-
