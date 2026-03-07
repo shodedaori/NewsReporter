@@ -154,6 +154,9 @@ venv.bak/
 # mkdocs documentation
 /site
 output/
+.cache/
+data/*.db
+data/*.db-*
 configs/secret.setting.yaml
 
 # mypy

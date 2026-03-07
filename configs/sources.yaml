@@ -83,7 +83,7 @@ arxiv:
     - cs.LG
     - cs.CL
     - cs.CV
-  backcheck_days: 3
+  backcheck_days: 5
   max_results: 120
 
 github:
