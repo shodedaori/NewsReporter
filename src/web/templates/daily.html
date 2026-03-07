@@ -51,6 +51,51 @@
             <p>No news items found in the selected 24-hour window.</p>
             {% endif %}
           </div>
+
+          <h2>arXiv</h2>
+          <div class="post-body">
+            {% set arxiv_items = [] %}
+            {% if sections and sections.arxiv and sections.arxiv["items"] %}
+              {% set arxiv_items = sections.arxiv["items"] %}
+            {% endif %}
+            {% if arxiv_items %}
+              {% for item in arxiv_items %}
+              <div class="news-item">
+                <h3>
+                  <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
+                </h3>
+                <p class="item-meta">
+                  Score {{ item.signals.score }} |
+                  {{ item.published_at if item.published_at else "time unknown" }}
+                </p>
+                <p>{{ item.summary_short if item.summary_short else item.summary_raw }}</p>
+                {% if item.signals.keypoints %}
+                <ul>
+                  {% for kp in item.signals.keypoints %}
+                  <li>{{ kp }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+                {% if item.signals.takeaways %}
+                <p><strong>Takeaways:</strong></p>
+                <ul>
+                  {% for tw in item.signals.takeaways %}
+                  <li>{{ tw }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+                {% if item.summary_raw %}
+                <details class="abstract-toggle">
+                  <summary>Click to expand abstract</summary>
+                  <p>{{ item.summary_raw }}</p>
+                </details>
+                {% endif %}
+              </div>
+              {% endfor %}
+            {% else %}
+            <p>No arXiv papers found in the selected 24-hour window.</p>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>

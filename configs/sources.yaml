@@ -39,3 +39,49 @@ rss_news:
     - name: Google News Aggregated - NVIDIA
       url: https://news.google.com/rss/search?q=NVIDIA&hl=en-US&gl=US&ceid=US:en
       weight: 20
+
+arxiv:
+  keywords:
+    - large language model
+    - reasoning
+    - planning
+    - reinforcement learning
+    - multimodal
+    - image generation
+    - vision transformer
+    - video understanding
+    - triton
+    - cuda kernel
+    - custom kernel
+    - kernel fusion
+    - operator fusion
+    - gpu optimization
+    - memory bandwidth
+    - latency optimization
+    - throughput optimization
+    - mixed precision
+    - quantization
+    - tensor core
+    - inference acceleration
+    - serving system
+    - compiler optimization
+    - code generation
+    - runtime scheduling
+    - distributed inference
+    - pipeline parallelism
+    - model parallelism
+    - policy optimization
+    - policy gradient
+    - actor critic
+    - alignment
+    - tool use
+    - agent
+    - rag
+    - long context
+  categories:
+    - cs.AI
+    - cs.LG
+    - cs.CL
+    - cs.CV
+  backcheck_days: 3
+  max_results: 120

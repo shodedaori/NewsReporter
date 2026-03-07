@@ -56,7 +56,8 @@ class DailyOrchestrator:
             }
             generated_at = next(iter(section_results.values())).generated_at if section_results else ""
 
-            news_items = self._news_items_payload(section_results)
+            news_items = self._section_items_payload(section_results, "news")
+            arxiv_items = self._section_items_payload(section_results, "arxiv")
             daily_context = {
                 "site_name": self.app_config["app"]["site_name"],
                 "page_title": f"{digest_date.isoformat()} News Digest",
@@ -65,7 +66,10 @@ class DailyOrchestrator:
                 "generated_at": generated_at,
                 "stats": stats,
                 "items": news_items,
-                "sections": {"news": {"items": news_items, "stats": section_results.get("news").stats if section_results.get("news") else {}}},
+                "sections": {
+                    "news": {"items": news_items, "stats": section_results.get("news").stats if section_results.get("news") else {}},
+                    "arxiv": {"items": arxiv_items, "stats": section_results.get("arxiv").stats if section_results.get("arxiv") else {}},
+                },
             }
             daily_html = self.renderer.render_daily(daily_context)
             print("[progress] daily page rendered", flush=True)
@@ -119,9 +123,9 @@ class DailyOrchestrator:
             self.store.finish_run(run_id=run_id, status="failed", message=str(exc), stats={})
             raise
 
-    def _news_items_payload(self, section_results: dict[str, SectionResult]) -> list[dict]:
-        news_result = section_results.get("news")
-        if not news_result:
+    def _section_items_payload(self, section_results: dict[str, SectionResult], section: str) -> list[dict]:
+        result = section_results.get(section)
+        if not result:
             return []
         return [
             {
@@ -129,10 +133,11 @@ class DailyOrchestrator:
                 "url": item.url,
                 "published_at": item.published_at.isoformat() if item.published_at else None,
                 "summary_short": item.summary_short or "",
+                "summary_raw": item.summary_raw or "",
                 "signals": item.signals,
                 "section": item.section,
             }
-            for item in news_result.items
+            for item in result.items
         ]
 
 

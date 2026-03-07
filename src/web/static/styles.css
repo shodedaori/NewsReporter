@@ -155,3 +155,27 @@
   color: #666;
   font-size: 0.95em;
 }
+
+.section-blog-post .abstract-toggle {
+  margin-top: 0.6em;
+}
+
+.section-blog-post .abstract-toggle summary {
+  display: inline-block;
+  cursor: pointer;
+  color: #b00020;
+  text-decoration: underline;
+  border: 1px solid #b00020;
+  border-radius: 4px;
+  padding: 0.2em 0.5em;
+  font-weight: 600;
+  background: #fff7f8;
+}
+
+.section-blog-post .abstract-toggle summary:hover {
+  background: #ffe8ec;
+}
+
+.section-blog-post .abstract-toggle[open] summary {
+  margin-bottom: 0.5em;
+}

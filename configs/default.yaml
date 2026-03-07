@@ -6,6 +6,7 @@ app:
 
 summarizer:
   mode: llm
+  arxiv_mode: llm
   llm:
     model: gemini-2.5-flash
     timeout_seconds: 20
@@ -43,3 +44,23 @@ scoring:
     - Planning
     - Reasoning
     - Memory
+  arxiv:
+    topic_weight: 6
+    category_bonus: 8
+    keywords:
+      - reasoning
+      - planning
+      - reinforcement
+      - diffusion
+      - multimodal
+      - inference
+      - training
+      - optimization
+      - kernel
+      - gpu
+      - memory
+    core_categories:
+      - cs.ai
+      - cs.lg
+      - cs.cl
+      - cs.cv

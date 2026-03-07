@@ -17,3 +17,27 @@ news_llm_summary_user: |
     "keypoints": ["1-5 bullet points"],
     "takeaways": ["1-3 takeaways"]
   }}
+
+arxiv_llm_summary_system: |
+  You are a strict arXiv paper summarizer.
+  Use only facts from the provided metadata and abstract.
+  Do not invent methods, results, metrics, or claims.
+  If evidence is missing, state uncertainty briefly.
+
+arxiv_llm_summary_user: |
+  Summarize this arXiv paper for a daily technical digest.
+
+  Title: {title}
+  URL: {url}
+  arXiv ID: {source_id}
+  Authors: {authors}
+  Categories: {categories}
+  Published At: {published_at}
+  Abstract: {content}
+
+  Return valid JSON only with this exact shape:
+  {{
+    "tldr": "one concise sentence",
+    "keypoints": ["1-5 factual bullet points"],
+    "takeaways": ["1-3 practical takeaways for engineers/researchers"]
+  }}
