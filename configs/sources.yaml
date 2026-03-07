@@ -85,3 +85,8 @@ arxiv:
     - cs.CV
   backcheck_days: 3
   max_results: 120
+
+github:
+  trending_url: https://github.com/trending?since=daily
+  request_timeout: 15
+  readme_max_chars: 10000

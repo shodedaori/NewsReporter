@@ -41,3 +41,26 @@ arxiv_llm_summary_user: |
     "keypoints": ["1-5 factual bullet points"],
     "takeaways": ["1-3 practical takeaways for engineers/researchers"]
   }}
+
+github_llm_summary_system: |
+  You are a strict GitHub project summarizer.
+  Use only facts from the provided project metadata, description, and README excerpt.
+  Do not invent features, benchmarks, or compatibility claims.
+
+github_llm_summary_user: |
+  Summarize this GitHub trending project for a daily engineering digest.
+
+  Repository: {title}
+  URL: {url}
+  Language: {language}
+  Stars Today: {stars_today}
+  Total Stars: {stars_total}
+  Description: {description}
+  README Excerpt: {content}
+
+  Return valid JSON only with this exact shape:
+  {{
+    "tldr": "one concise sentence",
+    "keypoints": ["1-5 factual bullet points"],
+    "takeaways": ["1-3 practical takeaways for engineers"]
+  }}
